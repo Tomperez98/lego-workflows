@@ -3,10 +3,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Generic, TypeVar
-
-if TYPE_CHECKING:
-    from result import Result
+from typing import Generic, TypeVar
 
 
 @dataclass(frozen=True)
