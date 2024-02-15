@@ -7,7 +7,7 @@ from typing import Generic, TypeVar
 
 
 @dataclass(frozen=True)
-class Response:
+class ResponseComponent:
     """Workflow response data."""
 
 
@@ -25,11 +25,11 @@ class DomainError(Exception):
 
 
 T = TypeVar("T")
-R = TypeVar("R", bound=Response)
+R = TypeVar("R", bound=ResponseComponent)
 
 
 @dataclass(frozen=True)
-class Command(Generic[R, T]):
+class CommandComponent(Generic[R, T]):
     """Workflow input data."""
 
     @abstractmethod

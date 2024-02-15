@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from lego_workflows.components import (
-        Command,
+        CommandComponent,
         DomainEvent,
         R,
         T,
@@ -22,7 +22,7 @@ def _commit_if_transaction_commiter(
 
 
 async def run_and_collect_events(
-    cmd: Command[R, T],
+    cmd: CommandComponent[R, T],
     transaction_commiter: TransactionCommiter[T] | None,
 ) -> tuple[R, list[DomainEvent]]:
     """Run command and collect events."""
@@ -43,7 +43,7 @@ async def _publish_events(events: list[DomainEvent]) -> None:
 
 
 async def execute(
-    cmd: Command[R, T], transaction_commiter: TransactionCommiter[T] | None
+    cmd: CommandComponent[R, T], transaction_commiter: TransactionCommiter[T] | None
 ) -> R:
     """Execute workflow and publish events."""
     result, events = await run_and_collect_events(

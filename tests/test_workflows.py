@@ -7,13 +7,18 @@ from uuid import UUID, uuid4
 import pytest
 
 import lego_workflows
-from lego_workflows.components import Command, DomainError, DomainEvent, Response
+from lego_workflows.components import (
+    CommandComponent,
+    DomainError,
+    DomainEvent,
+    ResponseComponent,
+)
 
 logger = getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class OpenBankAccountResponse(Response):
+class Response(ResponseComponent):
     account_id: UUID
     name: str
     initial_balance: int
@@ -33,13 +38,13 @@ class NotEnoughFoundsError(DomainError):
 
 
 @dataclass(frozen=True)
-class OpenBankAccountCommand(Command[OpenBankAccountResponse, str]):
+class Command(CommandComponent[Response, str]):
     name: str
     initial_balance: int
 
     async def run(
         self, state_changes: list[str], events: list[DomainEvent]
-    ) -> OpenBankAccountResponse:
+    ) -> Response:
         account_id = uuid4()
         balance_after_charge = self.initial_balance - 30
         if balance_after_charge < 0:
@@ -47,7 +52,7 @@ class OpenBankAccountCommand(Command[OpenBankAccountResponse, str]):
 
         state_changes.append("Insert account record")
         events.append(BankAccountOpened(account_id=account_id))
-        return OpenBankAccountResponse(
+        return Response(
             account_id=account_id,
             name=self.name,
             initial_balance=balance_after_charge,
@@ -56,7 +61,7 @@ class OpenBankAccountCommand(Command[OpenBankAccountResponse, str]):
 
 async def test_execute() -> None:
     result = await lego_workflows.execute(
-        cmd=OpenBankAccountCommand(name="Peter", initial_balance=50),
+        cmd=Command(name="Peter", initial_balance=50),
         transaction_commiter=None,
     )
     assert result.initial_balance == 20  # noqa: PLR2004
@@ -65,7 +70,7 @@ async def test_execute() -> None:
 
 async def test_run_command_and_collect_events() -> None:
     result, events = await lego_workflows.run_and_collect_events(
-        cmd=OpenBankAccountCommand(name="Peter", initial_balance=40),
+        cmd=Command(name="Peter", initial_balance=40),
         transaction_commiter=None,
     )
     assert result.initial_balance == 10  # noqa: PLR2004
@@ -76,6 +81,6 @@ async def test_run_command_and_collect_events() -> None:
 async def test_execute_with_failure() -> None:
     with pytest.raises(NotEnoughFoundsError):
         await lego_workflows.execute(
-            cmd=OpenBankAccountCommand(name="Peter", initial_balance=10),
+            cmd=Command(name="Peter", initial_balance=10),
             transaction_commiter=None,
         )
