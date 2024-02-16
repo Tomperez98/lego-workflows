@@ -62,7 +62,6 @@ class Command(CommandComponent[Response, str]):
 async def test_execute() -> None:
     result = await lego_workflows.execute(
         cmd=Command(name="Peter", initial_balance=50),
-        transaction_commiter=None,
     )
     assert result.initial_balance == 20  # noqa: PLR2004
     assert result.name == "Peter"
@@ -71,7 +70,6 @@ async def test_execute() -> None:
 async def test_run_command_and_collect_events() -> None:
     result, events = await lego_workflows.run_and_collect_events(
         cmd=Command(name="Peter", initial_balance=40),
-        transaction_commiter=None,
     )
     assert result.initial_balance == 10  # noqa: PLR2004
     assert len(events) == 1
@@ -82,5 +80,4 @@ async def test_execute_with_failure() -> None:
     with pytest.raises(NotEnoughFoundsError):
         await lego_workflows.execute(
             cmd=Command(name="Peter", initial_balance=10),
-            transaction_commiter=None,
         )
