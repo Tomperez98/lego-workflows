@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lego-workflows"
-version = "0.0.5"
+version = "0.0.6"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -14,7 +14,7 @@ classifiers = [
 authors = [
     { name = "Tomas Perez Alvarez", email = "tomasperezalvarez@gmail.com" },
 ]
-dependencies = ["pydantic < 3"]
+dependencies = []
 
 [project.urls]
 Documentation = "https://github.com/Tomperez98/lego-workflows#readme"
@@ -35,7 +35,6 @@ ban-relative-imports = "all"
 [tool.ruff.lint.flake8-tidy-imports.banned-api]
 enum = { msg = "`enum` is banned: Python enums are not allowed. Use typing.Literal and typing.TypeAlias to build enums" }
 mashumaro = { msg = "`mashumaro` is banned: We are using pydantic for data validation and serialization." }
-dataclasses = { msg = "`dataclasses` is banned: We are using pydantic for data validation and serialization." }
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "double"
