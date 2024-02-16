@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from logging import getLogger
 from uuid import UUID, uuid4
 
@@ -17,14 +16,12 @@ from lego_workflows.components import (
 logger = getLogger(__name__)
 
 
-@dataclass(frozen=True)
 class Response(ResponseComponent):
     account_id: UUID
     name: str
     initial_balance: int
 
 
-@dataclass(frozen=True)
 class BankAccountOpened(DomainEvent):
     account_id: UUID
 
@@ -37,7 +34,6 @@ class NotEnoughFoundsError(DomainError):
         super().__init__(f"{initial_balance:,} is not enough for opening an account.")
 
 
-@dataclass(frozen=True)
 class Command(CommandComponent[Response, str]):
     name: str
     initial_balance: int

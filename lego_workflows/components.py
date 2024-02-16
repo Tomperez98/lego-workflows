@@ -2,17 +2,16 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Generic, TypeVar
 
+from pydantic import BaseModel
 
-@dataclass(frozen=True)
-class ResponseComponent:
+
+class ResponseComponent(BaseModel):
     """Workflow response data."""
 
 
-@dataclass(frozen=True)
-class DomainEvent(ABC):
+class DomainEvent(BaseModel, ABC):
     """Worflow event."""
 
     @abstractmethod
@@ -28,8 +27,7 @@ T = TypeVar("T")
 R = TypeVar("R", bound=ResponseComponent)
 
 
-@dataclass(frozen=True)
-class CommandComponent(Generic[R, T]):
+class CommandComponent(BaseModel, Generic[R, T]):
     """Workflow input data."""
 
     @abstractmethod
