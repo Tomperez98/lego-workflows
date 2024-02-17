@@ -42,15 +42,12 @@ class Command(CommandComponent[Response, str]):
     name: str
     initial_balance: int
 
-    async def run(
-        self, state_changes: list[str], events: list[DomainEvent]
-    ) -> Response:
+    async def run(self, events: list[DomainEvent]) -> Response:
         account_id = uuid4()
         balance_after_charge = self.initial_balance - 30
         if balance_after_charge < 0:
             raise NotEnoughFoundsError(initial_balance=self.initial_balance)
 
-        state_changes.append("Insert account record")
         events.append(BankAccountOpened(account_id=account_id))
         return Response(
             account_id=account_id,
@@ -60,27 +57,28 @@ class Command(CommandComponent[Response, str]):
 
 
 async def test_execute() -> None:
-    result = await lego_workflows.execute(
-        cmd=Command(name="Peter", initial_balance=50),
-        transaction_commiter=None,
+    result, events = await lego_workflows.run_and_collect_events(
+        Command(name="Peter", initial_balance=50)
     )
     assert result.initial_balance == 20  # noqa: PLR2004
     assert result.name == "Peter"
+
+    await lego_workflows.publish_events(events=events)
 
 
 async def test_run_command_and_collect_events() -> None:
     result, events = await lego_workflows.run_and_collect_events(
         cmd=Command(name="Peter", initial_balance=40),
-        transaction_commiter=None,
     )
     assert result.initial_balance == 10  # noqa: PLR2004
     assert len(events) == 1
     assert isinstance(events[0], BankAccountOpened)
 
+    await lego_workflows.publish_events(events=events)
+
 
 async def test_execute_with_failure() -> None:
     with pytest.raises(NotEnoughFoundsError):
-        await lego_workflows.execute(
+        await lego_workflows.run_and_collect_events(
             cmd=Command(name="Peter", initial_balance=10),
-            transaction_commiter=None,
         )

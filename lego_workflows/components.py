@@ -29,6 +29,6 @@ class CommandComponent(Generic[R, T]):
     """Workflow input data."""
 
     @abstractmethod
-    async def run(self, state_changes: list[T], events: list[DomainEvent]) -> R:
+    async def run(self, events: list[DomainEvent]) -> R:
         """Execute workflow."""
         raise NotImplementedError
