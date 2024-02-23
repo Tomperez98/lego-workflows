@@ -38,7 +38,7 @@ class NotEnoughFoundsError(DomainError):
 
 
 @dataclass(frozen=True)
-class Command(CommandComponent[Response, str]):
+class Command(CommandComponent[Response]):
     name: str
     initial_balance: int
 

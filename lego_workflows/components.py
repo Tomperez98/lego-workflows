@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Generic, TypeVar
 
 
+@dataclass(frozen=True)
 class ResponseComponent:
     """Workflow response data."""
 
@@ -21,11 +23,11 @@ class DomainError(Exception):
     """Raised when a user violates a business rule."""
 
 
-T = TypeVar("T")
 R = TypeVar("R", bound=ResponseComponent)
 
 
-class CommandComponent(Generic[R, T]):
+@dataclass(frozen=True)
+class CommandComponent(Generic[R]):
     """Workflow input data."""
 
     @abstractmethod

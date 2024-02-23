@@ -9,12 +9,11 @@ if TYPE_CHECKING:
         CommandComponent,
         DomainEvent,
         R,
-        T,
     )
 
 
 async def run_and_collect_events(
-    cmd: CommandComponent[R, T],
+    cmd: CommandComponent[R],
 ) -> tuple[R, list[DomainEvent]]:
     """Run command and collect events."""
     events: list[DomainEvent] = []
