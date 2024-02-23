@@ -11,6 +11,7 @@ class ResponseComponent:
     """Workflow response data."""
 
 
+@dataclass(frozen=True)
 class DomainEvent(ABC):
     """Worflow event."""
 
