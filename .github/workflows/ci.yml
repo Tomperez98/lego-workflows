@@ -31,12 +31,15 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
           cache-dependency-path: pyproject.toml
+      
+      - name: Fix uv venv env variable
+        run: echo "VIRTUAL_ENV=${Python_ROOT_DIR}" >> $GITHUB_ENV
 
       - name: Install deps
         run: |
-          pip install -U pip
-          pip install -r requirements/dev.txt
-          pip install --no-deps -e .
+          pip install -U uv
+          uv pip install -r requirements/dev.txt
+          uv pip install --no-deps -e .
 
       - name: Check code
         run: pyrgo check

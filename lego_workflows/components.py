@@ -1,9 +1,13 @@
 """Workflow definition components."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
+
+if TYPE_CHECKING:
+    from result import Result
 
 
 @dataclass(frozen=True)
@@ -32,6 +36,6 @@ class CommandComponent(Generic[R]):
     """Workflow input data."""
 
     @abstractmethod
-    async def run(self, events: list[DomainEvent]) -> R:
+    async def run(self, events: list[DomainEvent]) -> Result[R, DomainError]:
         """Execute workflow."""
         raise NotImplementedError

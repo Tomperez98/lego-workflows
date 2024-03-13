@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lego-workflows"
-version = "0.0.11"
+version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -14,7 +14,7 @@ classifiers = [
 authors = [
     { name = "Tomas Perez Alvarez", email = "tomasperezalvarez@gmail.com" },
 ]
-dependencies = []
+dependencies = ["result"]
 
 [project.urls]
 Documentation = "https://github.com/Tomperez98/lego-workflows#readme"

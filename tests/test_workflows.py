@@ -5,6 +5,7 @@ from logging import getLogger
 from uuid import UUID, uuid4
 
 import pytest
+from result import Err, Ok, Result
 
 import lego_workflows
 from lego_workflows.components import (
@@ -42,17 +43,20 @@ class Command(CommandComponent[Response]):
     name: str
     initial_balance: int
 
-    async def run(self, events: list[DomainEvent]) -> Response:
+    # async def run(self, events: list[DomainEvent]) -> Response:
+    async def run(self, events: list[DomainEvent]) -> Result[Response, DomainError]:
         account_id = uuid4()
         balance_after_charge = self.initial_balance - 30
         if balance_after_charge < 0:
-            raise NotEnoughFoundsError(initial_balance=self.initial_balance)
+            return Err(NotEnoughFoundsError(initial_balance=self.initial_balance))
 
         events.append(BankAccountOpened(account_id=account_id))
-        return Response(
-            account_id=account_id,
-            name=self.name,
-            initial_balance=balance_after_charge,
+        return Ok(
+            Response(
+                account_id=account_id,
+                name=self.name,
+                initial_balance=balance_after_charge,
+            )
         )
 
 
