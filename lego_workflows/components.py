@@ -29,13 +29,14 @@ class DomainError(Exception):
 
 
 R = TypeVar("R", bound=ResponseComponent)
+E = TypeVar("E", bound=DomainError)
 
 
 @dataclass(frozen=True)
-class CommandComponent(Generic[R]):
+class CommandComponent(Generic[R, E]):
     """Workflow input data."""
 
     @abstractmethod
-    async def run(self, events: list[DomainEvent]) -> Result[R, DomainError]:
+    async def run(self, events: list[DomainEvent]) -> Result[R, E]:
         """Execute workflow."""
         raise NotImplementedError

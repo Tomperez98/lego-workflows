@@ -3,29 +3,27 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_never
 
-from result import Err
+from result import Err, Ok, Result
 
 if TYPE_CHECKING:
-    from lego_workflows.components import (
-        CommandComponent,
-        DomainEvent,
-        R,
-    )
+    from lego_workflows.components import CommandComponent, DomainEvent, E, R
 
 
 async def run_and_collect_events(
-    cmd: CommandComponent[R],
-) -> tuple[R, list[DomainEvent]]:
+    cmd: CommandComponent[R, E],
+) -> Result[tuple[R, list[DomainEvent]], E]:
     """Run command and collect events."""
     events: list[DomainEvent] = []
 
-    result = await cmd.run(events=events)
-    if isinstance(result, Err):
-        raise result.err()
-
-    return (result.unwrap(), events)
+    match await cmd.run(events=events):
+        case Ok(ok):
+            return Ok((ok, events))
+        case Err(error):
+            return Err(error)
+        case _ as never:
+            assert_never(never)
 
 
 async def publish_events(events: list[DomainEvent]) -> None:

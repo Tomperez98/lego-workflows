@@ -12,7 +12,7 @@ charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via pyrgo
-coverage==7.4.3
+coverage==7.4.4
     # via pytest-cov
 cyclonedx-python-lib==6.4.3
     # via pip-audit
@@ -94,7 +94,7 @@ result==0.16.1
     # via pyrgo
 rich==13.7.1
     # via pip-audit
-ruff==0.3.2
+ruff==0.3.3
     # via pyrgo
 six==1.16.0
     # via html5lib
@@ -113,7 +113,7 @@ typing-extensions==4.10.0
     #   mypy
 urllib3==2.2.1
     # via requests
-uv==0.1.18
+uv==0.1.21
     # via pyrgo
 vulture==2.11
     # via pyrgo

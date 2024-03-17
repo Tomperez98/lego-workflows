@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from logging import getLogger
+from typing import TypeAlias, assert_never
 from uuid import UUID, uuid4
 
-import pytest
-from result import Err, Ok, Result
+from result import Err, Ok
 
 import lego_workflows
 from lego_workflows.components import (
@@ -38,13 +38,17 @@ class NotEnoughFoundsError(DomainError):
         super().__init__(f"{initial_balance:,} is not enough for opening an account.")
 
 
+Errors: TypeAlias = NotEnoughFoundsError
+
+
 @dataclass(frozen=True)
-class Command(CommandComponent[Response]):
+class Command(CommandComponent[Response, Errors]):
     name: str
     initial_balance: int
 
-    # async def run(self, events: list[DomainEvent]) -> Response:
-    async def run(self, events: list[DomainEvent]) -> Result[Response, DomainError]:
+    async def run(
+        self, events: list[DomainEvent]
+    ) -> Ok[Response] | Err[NotEnoughFoundsError]:
         account_id = uuid4()
         balance_after_charge = self.initial_balance - 30
         if balance_after_charge < 0:
@@ -61,28 +65,42 @@ class Command(CommandComponent[Response]):
 
 
 async def test_execute() -> None:
-    result, events = await lego_workflows.run_and_collect_events(
+    match await lego_workflows.run_and_collect_events(
         Command(name="Peter", initial_balance=50)
-    )
-    assert result.initial_balance == 20  # noqa: PLR2004
-    assert result.name == "Peter"
-
-    await lego_workflows.publish_events(events=events)
+    ):
+        case Ok((result, events)):
+            assert result.initial_balance == 20  # noqa: PLR2004
+            assert result.name == "Peter"
+            await lego_workflows.publish_events(events=events)
+        case Err():
+            raise AssertionError
+        case _ as never:
+            assert_never(never)
 
 
 async def test_run_command_and_collect_events() -> None:
-    result, events = await lego_workflows.run_and_collect_events(
+    match await lego_workflows.run_and_collect_events(
         cmd=Command(name="Peter", initial_balance=40),
-    )
-    assert result.initial_balance == 10  # noqa: PLR2004
-    assert len(events) == 1
-    assert isinstance(events[0], BankAccountOpened)
+    ):
+        case Ok((result, events)):
+            assert result.initial_balance == 10  # noqa: PLR2004
+            assert len(events) == 1
+            assert isinstance(events[0], BankAccountOpened)
 
-    await lego_workflows.publish_events(events=events)
+            await lego_workflows.publish_events(events=events)
+        case Err():
+            raise AssertionError
+        case _ as never:
+            assert_never(never)
 
 
 async def test_execute_with_failure() -> None:
-    with pytest.raises(NotEnoughFoundsError):
-        await lego_workflows.run_and_collect_events(
-            cmd=Command(name="Peter", initial_balance=10),
-        )
+    match await lego_workflows.run_and_collect_events(
+        cmd=Command(name="Peter", initial_balance=10),
+    ):
+        case Ok(_):
+            raise AssertionError
+        case Err(error):
+            assert isinstance(error, NotEnoughFoundsError)
+        case _ as never:
+            assert_never(never)
