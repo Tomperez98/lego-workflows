@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, assert_never
+from typing import TYPE_CHECKING
 
 from result import Err, Ok, Result
 
@@ -18,12 +18,11 @@ async def run_and_collect_events(
     events: list[DomainEvent] = []
 
     match await cmd.run(events=events):
-        case Ok(ok):
-            return Ok((ok, events))
+        case Ok(result):
+            return Ok((result, events))
         case Err(error):
             return Err(error)
-        case _ as never:
-            assert_never(never)
+    raise NotImplementedError
 
 
 async def publish_events(events: list[DomainEvent]) -> None:

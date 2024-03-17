@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from logging import getLogger
-from typing import TypeAlias, assert_never
+from typing import TypeAlias
 from uuid import UUID, uuid4
 
 from result import Err, Ok
@@ -74,8 +74,6 @@ async def test_execute() -> None:
             await lego_workflows.publish_events(events=events)
         case Err():
             raise AssertionError
-        case _ as never:
-            assert_never(never)
 
 
 async def test_run_command_and_collect_events() -> None:
@@ -90,8 +88,6 @@ async def test_run_command_and_collect_events() -> None:
             await lego_workflows.publish_events(events=events)
         case Err():
             raise AssertionError
-        case _ as never:
-            assert_never(never)
 
 
 async def test_execute_with_failure() -> None:
@@ -102,5 +98,3 @@ async def test_execute_with_failure() -> None:
             raise AssertionError
         case Err(error):
             assert isinstance(error, NotEnoughFoundsError)
-        case _ as never:
-            assert_never(never)
